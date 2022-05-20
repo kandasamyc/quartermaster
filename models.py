@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import exists, select
 from sqlalchemy.sql.schema import Column, ForeignKey, Table
 from sqlalchemy.sql.sqltypes import Integer, String
+from pint import Unit
 
 from init import Q_, Base, ureg
 from exceptions import (
@@ -55,7 +56,7 @@ class Material(Base):
     def create(name, s, u, session):
         if u != "" and u not in ureg:
             raise UndefinedUnitException(f"{u} is not a defined unit")
-        mat = Material(name=name, stock=s, unit=u)
+        mat = Material(name=name, stock=s, unit=str(ureg.Unit(u)))
         session.add(mat)
         session.commit()
 
@@ -76,7 +77,7 @@ class Item(Base):
             raise ZeroQuantityException(
                 f"A quantity of 0 is not allowed for {mat} and {self}"
             )
-        a = Association(quantity=quant, unit=unit)
+        a = Association(quantity=quant, unit=str(ureg.Unit(unit)))
         a.material = mat
         self.materials.append(a)
         if session:

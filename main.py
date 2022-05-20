@@ -7,9 +7,14 @@ from init import engine, Base
 Base.metadata.create_all(engine)
 
 with Session(engine) as session:
-    Material.create("flour", 0.5, "cups", session)
-    Material.create("egg", 4, "", session)
-    Item.create("pancake", {"flour": (0.5, "cup"), "egg": (1, "")}, session)
+    Material.create("flour", 17, "cup", session)
+    Material.create("egg", 33, "items", session)
+    Material.create("cinnamon", 16, "dashes", session)
+    Item.create(
+        "pancake",
+        {"flour": (0.5, "cup"), "egg": (1, "item"), "cinnamon": (1, "pinch")},
+        session,
+    )
     session.commit()
 
 with Session(engine) as session:
