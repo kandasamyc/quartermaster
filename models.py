@@ -5,7 +5,13 @@ from sqlalchemy.sql import exists, select
 from sqlalchemy.sql.schema import Column, ForeignKey, Table
 from sqlalchemy.sql.sqltypes import Integer, String
 
-from init import Q_, Base
+from init import Q_, Base, ureg
+from exceptions import (
+    UndefinedUnitException,
+    UndefinedMaterialException,
+    StockRequiredException,
+    ZeroQuantityException,
+)
 
 
 class Association(Base):
@@ -28,12 +34,30 @@ class Material(Base):
     unit = Column(String)
 
     def increment(self, n, u):
+        if u not in ureg:
+            raise UndefinedUnitException(f"{u} is not a defined unit")
         self.stock = (Q_(self.stock, self.unit) + Q_(n, u)).to(self.unit).magnitude
 
     def decrement(self, n, u):
+        if u != "" and u not in ureg:
+            raise UndefinedUnitException(f"{u} is not a defined unit")
         result = (Q_(self.stock, self.unit) - Q_(n, u)).to(self.unit).magnitude
         if result >= 0:
             self.stock = result
+        else:
+            raise StockRequiredException()
+
+    @staticmethod
+    def get(name, session):
+        return session.execute(select(Material).where(Material.name == name)).first()[0]
+
+    @staticmethod
+    def create(name, s, u, session):
+        if u != "" and u not in ureg:
+            raise UndefinedUnitException(f"{u} is not a defined unit")
+        mat = Material(name=name, stock=s, unit=u)
+        session.add(mat)
+        session.commit()
 
     def __repr__(self) -> str:
         return f"Material(id={self.id!r}, name={self.name!r}, stock={self.stock!r}, unit={self.unit!r})"
@@ -46,6 +70,12 @@ class Item(Base):
     materials = relationship("Association")
 
     def add_material(self, mat, quant, unit, session=None):
+        if unit != "" and unit not in ureg:
+            raise UndefinedUnitException(f"Unit {unit} is not a defined unit")
+        if quant == 0:
+            raise ZeroQuantityException(
+                f"A quantity of 0 is not allowed for {mat} and {self}"
+            )
         a = Association(quantity=quant, unit=unit)
         a.material = mat
         self.materials.append(a)
@@ -54,14 +84,13 @@ class Item(Base):
         return a
 
     @staticmethod
-    def create_item(item_name, materials, session):
+    def create(item_name, materials, session):
         item = Item(name=item_name)
         session.add(item)
         for name, info in materials.items():
-            mat = session.execute(select(Material).where(Material.name == name)).first()
+            mat = Material.get(name, session)
             if mat is None:
-                mat = Material(name=name)
-                session.add(mat)
+                raise UndefinedMaterialException(f"{name} is not a defined material")
             item.add_material(mat, info[0], info[1], session)
         session.commit()
 
