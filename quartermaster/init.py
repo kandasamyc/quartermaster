@@ -1,8 +1,9 @@
+import os
+
 from pint import UnitRegistry
+from rich.console import Console
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from rich.console import Console
-import os
 
 db_path = f"{os.getenv('HOME')}/.quartermaster"
 if not os.path.exists(db_path):

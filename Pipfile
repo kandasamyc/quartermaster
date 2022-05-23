@@ -13,6 +13,7 @@ babel = "*"
 pyright = "*"
 black = "*"
 isort = "*"
+pyflakes = "*"
 
 [requires]
 python_version = "3.9"

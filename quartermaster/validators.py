@@ -1,10 +1,9 @@
 import click
-from rich.table import Table
-from sqlalchemy import select
-from sqlalchemy.orm import Session
-from .models import Material, Item
-from .init import engine, Q_, console, ureg
 from pint import DimensionalityError
+from sqlalchemy.orm import Session
+
+from .init import Q_, engine, ureg
+from .models import Item, Material
 
 
 def validate_material_name(ctx, param, value):

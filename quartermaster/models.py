@@ -1,10 +1,8 @@
 import math
-from enum import unique
 
-from pint import Unit
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import exists, select
-from sqlalchemy.sql.schema import Column, ForeignKey, Table
+from sqlalchemy.sql import select
+from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String
 
 from .exceptions import (
