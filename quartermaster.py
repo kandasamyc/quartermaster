@@ -264,6 +264,35 @@ def provision(items):
         console.print(mats)
 
 
+@click.group()
+def modify():
+    pass
+
+
+@click.command("mat")
+@click.argument("name", type=click.UNPROCESSED, callback=validate_material_exists)
+@click.argument("prop", type=click.Choice(["location", "category"]))
+@click.argument("new_value")
+def modify_material(name, prop, new_value):
+    with Session(engine) as session:
+        mat = Material.get(name, session)
+        if prop == "location":
+            mat.location = new_value
+        else:
+            mat.category = new_value
+        session.commit()
+
+
+@click.command("item")
+@click.argument("name", type=click.UNPROCESSED, callback=validate_item_exists)
+@click.argument("new_value")
+def modify_item(name, new_value):
+    with Session(engine) as session:
+        item = Item.get(name, session)
+        item.category = new_value
+        session.commit()
+
+
 def merge_dicts(dict_list):
     return functools.reduce(
         lambda d1, d2: {k: d1.get(k, 0) + d2.get(k, 0) for k in set(d1) | set(d2)},
@@ -274,8 +303,11 @@ def merge_dicts(dict_list):
 cli.add_command(list_entries)
 create.add_command(create_material)
 create.add_command(create_item)
+modify.add_command(modify_material)
+modify.add_command(modify_item)
 cli.add_command(create)
 cli.add_command(replenish)
 cli.add_command(consume)
 cli.add_command(produce)
 cli.add_command(provision)
+cli.add_command(modify)
