@@ -1,18 +1,19 @@
+import math
 from enum import unique
 
+from pint import Unit
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import exists, select
 from sqlalchemy.sql.schema import Column, ForeignKey, Table
 from sqlalchemy.sql.sqltypes import Integer, String
-from pint import Unit
 
-from init import Q_, Base, ureg
 from exceptions import (
-    UndefinedUnitException,
-    UndefinedMaterialException,
     StockRequiredException,
+    UndefinedMaterialException,
+    UndefinedUnitException,
     ZeroQuantityException,
 )
+from init import Q_, Base, ureg
 
 
 class Association(Base):
@@ -33,6 +34,8 @@ class Material(Base):
     name = Column(String, unique=True)
     stock = Column(Integer)
     unit = Column(String)
+    category = Column(String)
+    location = Column(String)
 
     def increment(self, n, u):
         if u not in ureg:
@@ -50,13 +53,16 @@ class Material(Base):
 
     @staticmethod
     def get(name, session):
-        return session.execute(select(Material).where(Material.name == name)).first()[0]
+        result = session.execute(select(Material).where(Material.name == name)).first()
+        return None if result is None else result[0]
 
     @staticmethod
-    def create(name, s, u, session):
+    def create(name, s, u, session, c=None, l=None):
         if u != "" and u not in ureg:
             raise UndefinedUnitException(f"{u} is not a defined unit")
-        mat = Material(name=name, stock=s, unit=str(ureg.Unit(u)))
+        mat = Material(
+            name=name, stock=s, unit=str(ureg.Unit(u)), category=c, location=l
+        )
         session.add(mat)
         session.commit()
 
@@ -68,6 +74,7 @@ class Item(Base):
     __tablename__ = "item"
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
+    category = Column(String)
     materials = relationship("Association")
 
     def add_material(self, mat, quant, unit, session=None):
@@ -85,8 +92,8 @@ class Item(Base):
         return a
 
     @staticmethod
-    def create(item_name, materials, session):
-        item = Item(name=item_name)
+    def create(item_name, materials, session, category=None):
+        item = Item(name=item_name, category=category)
         session.add(item)
         for name, info in materials.items():
             mat = Material.get(name, session)
@@ -95,17 +102,27 @@ class Item(Base):
             item.add_material(mat, info[0], info[1], session)
         session.commit()
 
+    @staticmethod
+    def get(name, session):
+        result = session.execute(select(Item).where(Item.name == name)).first()
+        return None if result is None else result[0]
+
     def produceable(self):
-        return min(
-            [
-                (Q_(mat.material.stock, mat.material.unit) / Q_(mat.quantity, mat.unit))
-                .to_base_units()
-                .magnitude
-                for mat in self.materials
-            ]
+        return math.floor(
+            min(
+                [
+                    (
+                        Q_(mat.material.stock, mat.material.unit)
+                        / Q_(mat.quantity, mat.unit)
+                    )
+                    .to_base_units()
+                    .magnitude
+                    for mat in self.materials
+                ]
+            )
         )
 
-    def consume(self, num):
+    def produce(self, num):
         for assoc in self.materials:
             assoc.material.decrement(assoc.quantity, assoc.unit)
 

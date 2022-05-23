@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a4ac528fe83ca9640259fa456dc2c8076b58270d88a6a5bcf578dd44508a961b"
+            "sha256": "4ea88808f08f85e1d845fdde9b0d0236e6949a35c1eead16076f5023e1e14b06"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,14 @@
         ]
     },
     "default": {
+        "babel": {
+            "hashes": [
+                "sha256:3f349e85ad3154559ac4930c3918247d319f21910d5ce4b25d439ed8693b98d2",
+                "sha256:98aeaca086133efb3e1e2aad0396987490c8425929ddbcfe0550184fdc54cd13"
+            ],
+            "index": "pypi",
+            "version": "==2.10.1"
+        },
         "commonmark": {
             "hashes": [
                 "sha256:452f9dc859be7f06631ddcb328b6919c67984aca654e5fefb3914d54691aed60",
@@ -98,6 +106,13 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==2.12.0"
+        },
+        "pytz": {
+            "hashes": [
+                "sha256:1e760e2fe6a8163bc0b3d9a19c4f84342afa0a2affebfaa84b01b978a02ecaa7",
+                "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"
+            ],
+            "version": "==2022.1"
         },
         "rich": {
             "hashes": [
@@ -227,11 +242,11 @@
         },
         "pyright": {
             "hashes": [
-                "sha256:363e4989c47db48a937035c0915efa37180d7cae1202258b98d485bf55a08cee",
-                "sha256:3fd9f78165c25e2fa2c2b392971b88ff9920fa300e89d07a7b041d8f9635d397"
+                "sha256:385084c1eaea56ee7b727d6f83a35774abe35036e37d527a692a9842af4c754d",
+                "sha256:88c9be21af5e21749d4ca4e6a605800bdc0848312eac9ff7cc584b401d9696d8"
             ],
             "index": "pypi",
-            "version": "==1.1.247"
+            "version": "==1.1.248"
         },
         "tomli": {
             "hashes": [
