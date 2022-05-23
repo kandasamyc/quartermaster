@@ -6,11 +6,11 @@ from rich.console import Console
 from rich.table import Table
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
-from exceptions import StockRequiredException
+from .exceptions import StockRequiredException
 
-from init import Q_, Base, engine, ureg
-from models import Association, Base, Item, Material
-from commands import (
+from .init import Q_, Base, engine, ureg
+from .models import Association, Base, Item, Material
+from .commands import (
     cli,
     create,
     modify,

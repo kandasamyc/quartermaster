@@ -7,13 +7,13 @@ from sqlalchemy.sql import exists, select
 from sqlalchemy.sql.schema import Column, ForeignKey, Table
 from sqlalchemy.sql.sqltypes import Integer, String
 
-from exceptions import (
+from .exceptions import (
     StockRequiredException,
     UndefinedMaterialException,
     UndefinedUnitException,
     ZeroQuantityException,
 )
-from init import Q_, Base, ureg
+from .init import Q_, Base, ureg
 
 
 class Association(Base):

@@ -2,9 +2,9 @@ import click
 from rich.table import Table
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from models import Material, Item
-from init import engine, Q_, console
-from validators import (
+from .models import Material, Item
+from .init import engine, Q_, console
+from .validators import (
     validate_item_arg,
     validate_item_exists,
     validate_item_name,
